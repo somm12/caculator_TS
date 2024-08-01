@@ -1,35 +1,119 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { calculate } from "../logic/caculateFunc";
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
+  height: 670px;
+  background-color: black;
+  justify-content: flex-end;
+  padding-bottom: 10px;
+  border-radius: 60px;
+  width: 370px;
 `;
 
-const Button = styled.button`
-  font-size: 24px;
+const ButtonRow = styled.div`
+  display: flex;
+  justify-content: center;
 `;
+const NumButton = styled.button`
+  font-size: 24px;
+  border-radius: 50%;
+  height: 72px;
+  width: 72px;
+  margin: 3px 3px;
+  background-color: #343434;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  &:hover {
+    background-color: gray;
+  }
+`;
+
+const ControlButton = styled.button`
+  font-size: 24px;
+  border-radius: 50%;
+  height: 72px;
+  width: 72px;
+  margin: 3px 3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #a5a5a5;
+  &:hover {
+    background-color: lightgray;
+  }
+`;
+
+const OperatorButton = styled.button`
+  background-color: #ff9f0a;
+
+  font-size: 34px;
+  border-radius: 50%;
+  height: 72px;
+  width: 72px;
+  margin: 3px 3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  &:hover {
+    background-color: white;
+    color: #ff9f0a;
+  }
+`;
+const Zero = styled.button`
+  font-size: 24px;
+  border-radius: 35px;
+  height: 72px;
+  width: 145px;
+  margin-right: 10px;
+  text-align: left;
+  padding-left: 32px;
+  display: flex;
+
+  align-items: center;
+  color: white;
+  background-color: #343434;
+  &:hover {
+    background-color: lightgray;
+  }
+`;
+
+const Result = styled.input`
+  background-color: black;
+  color: white;
+  border: none;
+  font-size: 50px;
+  width: 100%;
+  text-align: end;
+  margin-right: 47px;
+`;
+const ResultDiv = styled.div`
+  display: flex;
+`;
+
 let stack: (string | number)[] = [];
 let activeOperator = false;
 let activeNegative = false;
 const Calculator: React.FC = () => {
   const [result, setResult] = useState("0");
+  const [operatorActive, setOperatorActive] = useState(false);
 
-  const screenHandler = (inputValue: string) => {
-    stack.push(inputValue);
-    // 값이 1개면 화면에 표시
-    // 값이 3개면 연산해서 화면에 표시 후, 연산 결과 하나만 다시 넣기.
-  };
   const init = () => {
     setResult("0");
     stack = [];
+    setOperatorActive(false);
   };
   const pressEqual = () => {
     stack.push(+result);
 
     const value = calculate(stack);
-    stack = [value];
+
     setResult(value.toString());
+    setOperatorActive(false);
   };
   const pressNumber = (num: number) => {
     if (activeOperator) {
@@ -37,10 +121,12 @@ const Calculator: React.FC = () => {
       activeOperator = false;
     }
     setResult((prev) => prev + num.toString());
+    setOperatorActive(false);
   };
   const pressPoint = () => {
-    if (result == "") setResult("0.");
+    if (result === "") setResult("0.");
     else setResult((prev) => prev + ".");
+    setOperatorActive(false);
   }; // 소수점 입력시.
 
   const pressNegative = () => {
@@ -48,6 +134,9 @@ const Calculator: React.FC = () => {
     setResult((prev) => (+prev * -1).toString());
   };
   const pressOperator = (operator: string) => {
+    // 이전까지 입력했던 숫자를 가지고 연산.
+    // 여러번 연산자를 눌렀을 때, 연산이 되지 않도록 하기 위함
+    if (stack.length > 0 && typeof stack[stack.length - 1] == "string") return;
     activeOperator = !activeOperator;
     stack.push(+result);
 
@@ -56,62 +145,58 @@ const Calculator: React.FC = () => {
     stack = [value];
     stack.push(operator);
     setResult(value.toString());
-    console.log(stack, value);
+
+    setOperatorActive(true);
+  };
+
+  const pressPercentage = () => {
+    if (result === "") setResult("0");
+    else {
+      const value = +result / 100;
+      setResult(value.toString());
+    }
   };
 
   return (
     <Wrapper>
-      <div>
-        <input
+      <ResultDiv>
+        <Result
           type="string"
           onChange={(e) => setResult(e.target.value)}
           value={result}
           readOnly
         />
-      </div>
+      </ResultDiv>
       <div>
-        <div>
-          <Button onClick={init}>C</Button>
-          <Button onClick={() => pressNegative()}>+/-</Button>
-          <Button onClick={() => pressOperator("%")}>%</Button>
-          <Button onClick={() => pressOperator("÷")}>÷</Button>
-        </div>
-        <div>
-          <Button onClick={() => pressNumber(7)}>7</Button>
-          <Button onClick={() => pressNumber(8)}>8</Button>
-          <Button onClick={() => pressNumber(9)}>9</Button>
-          <Button onClick={() => pressOperator("x")}>×</Button>
-        </div>
-        <div>
-          <Button onClick={() => pressNumber(4)}>4</Button>
-          <Button onClick={() => pressNumber(5)}>5</Button>
-          <Button onClick={() => pressNumber(6)}>6</Button>
-          <Button onClick={() => pressOperator("-")}>-</Button>
-        </div>
-        <div>
-          <Button onClick={() => pressNumber(1)}>1</Button>
-          <Button onClick={() => pressNumber(2)}>2</Button>
-          <Button onClick={() => pressNumber(3)}>3</Button>
-          <Button
-            // onClick={() => {
-            //   // 여러번 누름 방지 필수.
-            //   stack.push(result);
-            //   const value = calculate(stack);
-            //   setResult("");
-            //   stack = [value];
-            //   stack.push("+");
-            //   console.log(stack, value);
-            // }}
-            onClick={() => pressOperator("+")}
-          >
-            +
-          </Button>
-        </div>
-        <div>
-          <Button onClick={() => pressNumber(0)}>0</Button>
-          <Button onClick={pressPoint}>.</Button>
-          <Button onClick={pressEqual}>=</Button>
-        </div>
+        <ButtonRow>
+          <ControlButton onClick={init}>C</ControlButton>
+          <ControlButton onClick={() => pressNegative()}>+/-</ControlButton>
+          <ControlButton onClick={() => pressPercentage()}>%</ControlButton>
+          <OperatorButton onClick={() => pressOperator("÷")}>÷</OperatorButton>
+        </ButtonRow>
+        <ButtonRow>
+          <NumButton onClick={() => pressNumber(7)}>7</NumButton>
+          <NumButton onClick={() => pressNumber(8)}>8</NumButton>
+          <NumButton onClick={() => pressNumber(9)}>9</NumButton>
+          <OperatorButton onClick={() => pressOperator("x")}>×</OperatorButton>
+        </ButtonRow>
+        <ButtonRow>
+          <NumButton onClick={() => pressNumber(4)}>4</NumButton>
+          <NumButton onClick={() => pressNumber(5)}>5</NumButton>
+          <NumButton onClick={() => pressNumber(6)}>6</NumButton>
+          <OperatorButton onClick={() => pressOperator("-")}>-</OperatorButton>
+        </ButtonRow>
+        <ButtonRow>
+          <NumButton onClick={() => pressNumber(1)}>1</NumButton>
+          <NumButton onClick={() => pressNumber(2)}>2</NumButton>
+          <NumButton onClick={() => pressNumber(3)}>3</NumButton>
+          <OperatorButton onClick={() => pressOperator("+")}>+</OperatorButton>
+        </ButtonRow>
+        <ButtonRow>
+          <Zero onClick={() => pressNumber(0)}>0</Zero>
+          <NumButton onClick={pressPoint}>.</NumButton>
+          <OperatorButton onClick={pressEqual}>=</OperatorButton>
+        </ButtonRow>
       </div>
     </Wrapper>
   );
