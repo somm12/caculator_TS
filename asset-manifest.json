@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/caculator_TS/static/css/main.46df7766.css",
+    "main.js": "/caculator_TS/static/js/main.7c3dd693.js",
+    "static/js/453.83bdee10.chunk.js": "/caculator_TS/static/js/453.83bdee10.chunk.js",
+    "index.html": "/caculator_TS/index.html",
+    "main.46df7766.css.map": "/caculator_TS/static/css/main.46df7766.css.map",
+    "main.7c3dd693.js.map": "/caculator_TS/static/js/main.7c3dd693.js.map",
+    "453.83bdee10.chunk.js.map": "/caculator_TS/static/js/453.83bdee10.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.46df7766.css",
+    "static/js/main.7c3dd693.js"
+  ]
+}
