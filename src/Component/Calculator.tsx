@@ -1,111 +1,25 @@
 import React, { useState } from "react";
-import styled from "styled-components";
 import { calculate } from "../logic/caculateFunc";
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 670px;
-  background-color: black;
-  justify-content: flex-end;
-  padding-bottom: 10px;
-  border-radius: 60px;
-  width: 370px;
-`;
+import {
+  Wrapper,
+  Result,
+  ResultDiv,
+  ButtonRow,
+  NumButton,
+  ControlButton,
+  OperatorButton,
+  Zero,
+} from "../css/style";
 
-const ButtonRow = styled.div`
-  display: flex;
-  justify-content: center;
-`;
-const NumButton = styled.button`
-  font-size: 24px;
-  border-radius: 50%;
-  height: 72px;
-  width: 72px;
-  margin: 3px 3px;
-  background-color: #343434;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  &:hover {
-    background-color: gray;
-  }
-`;
-
-const ControlButton = styled.button`
-  font-size: 24px;
-  border-radius: 50%;
-  height: 72px;
-  width: 72px;
-  margin: 3px 3px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #a5a5a5;
-  &:hover {
-    background-color: lightgray;
-  }
-`;
-
-const OperatorButton = styled.button`
-  background-color: #ff9f0a;
-
-  font-size: 34px;
-  border-radius: 50%;
-  height: 72px;
-  width: 72px;
-  margin: 3px 3px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  &:hover {
-    background-color: white;
-    color: #ff9f0a;
-  }
-`;
-const Zero = styled.button`
-  font-size: 24px;
-  border-radius: 35px;
-  height: 72px;
-  width: 145px;
-  margin-right: 10px;
-  text-align: left;
-  padding-left: 32px;
-  display: flex;
-
-  align-items: center;
-  color: white;
-  background-color: #343434;
-  &:hover {
-    background-color: lightgray;
-  }
-`;
-
-const Result = styled.input`
-  background-color: black;
-  color: white;
-  border: none;
-  font-size: 50px;
-  width: 100%;
-  text-align: end;
-  margin-right: 47px;
-`;
-const ResultDiv = styled.div`
-  display: flex;
-`;
-
-let stack: (string | number)[] = [];
+let stack: (string | number)[] = []; // 연산자 or 숫자 배열.
 let activeOperator = false;
 let activeNegative = false;
 const Calculator: React.FC = () => {
   const [result, setResult] = useState("0");
-  const [operatorActive, setOperatorActive] = useState(false);
 
   const init = () => {
     setResult("0");
     stack = [];
-    setOperatorActive(false);
   };
   const pressEqual = () => {
     stack.push(+result);
@@ -113,7 +27,6 @@ const Calculator: React.FC = () => {
     const value = calculate(stack);
 
     setResult(value.toString());
-    setOperatorActive(false);
   };
   const pressNumber = (num: number) => {
     if (activeOperator) {
@@ -121,12 +34,10 @@ const Calculator: React.FC = () => {
       activeOperator = false;
     }
     setResult((prev) => prev + num.toString());
-    setOperatorActive(false);
   };
   const pressPoint = () => {
     if (result === "") setResult("0.");
     else setResult((prev) => prev + ".");
-    setOperatorActive(false);
   }; // 소수점 입력시.
 
   const pressNegative = () => {
@@ -135,8 +46,8 @@ const Calculator: React.FC = () => {
   };
   const pressOperator = (operator: string) => {
     // 이전까지 입력했던 숫자를 가지고 연산.
-    // 여러번 연산자를 눌렀을 때, 연산이 되지 않도록 하기 위함
-    if (stack.length > 0 && typeof stack[stack.length - 1] == "string") return;
+
+    if (stack.length > 0 && typeof stack[stack.length - 1] == "string") return; // 여러번 연산자를 눌렀을 때, 연산이 되지 않도록 하기 위함
     activeOperator = !activeOperator;
     stack.push(+result);
 
@@ -145,8 +56,6 @@ const Calculator: React.FC = () => {
     stack = [value];
     stack.push(operator);
     setResult(value.toString());
-
-    setOperatorActive(true);
   };
 
   const pressPercentage = () => {
